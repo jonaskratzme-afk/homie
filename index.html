@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Help a Homie find a Home — Jonas sucht eine Wohnung in Hamburg</title>
+<meta name="description" content="Jonas sucht eine 1–2-Zimmer-Wohnung in Hamburg. Hast du einen Tipp? Schreib mir." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --blue: #1e3df0;
+    --blue-deep: #0a1fb8;
+    --cream: #f4ede0;
+    --ink: #0a0a0a;
+    --line: rgba(244, 237, 224, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: var(--blue);
+    color: var(--cream);
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.12;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  }
+
+  .nav {
+    position: absolute;
+    top: 28px;
+    left: 32px;
+    right: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+  .nav a {
+    color: var(--cream);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .nav a:hover { opacity: 0.7; }
+
+  /* ============ HERO with rotating column ============ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    background: var(--blue);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 20px 60px;
+  }
+
+  /* Subtle ground shadow under the column */
+  .hero::after {
+    content: "";
+    position: absolute;
+    bottom: 18%;
+    left: 50%;
+    width: 480px;
+    height: 60px;
+    transform: translateX(-50%);
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.45) 0%, transparent 70%);
+    filter: blur(8px);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: 70vh;
+    min-height: 520px;
+    perspective: 2400px;
+    perspective-origin: 50% 45%;
+    z-index: 2;
+  }
+
+  .column {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 360px;
+    height: 540px;
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%);
+    animation: spin 50s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: translate(-50%, -50%) rotateY(0deg); }
+    to   { transform: translate(-50%, -50%) rotateY(360deg); }
+  }
+
+  /* The 8 poster faces, arranged as octagon */
+  .face {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 360px;
+    height: 540px;
+    background-size: cover;
+    background-position: center;
+    backface-visibility: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* radius for a pentagon: r = (width/2) / tan(π/5) ≈ 180 / 0.7265 ≈ 248 */
+  .face-1 { background-image: url('assets/poster-1.jpeg'); transform: rotateY(0deg)    translateZ(248px); }
+  .face-2 { background-image: url('assets/poster-2.jpeg'); transform: rotateY(72deg)   translateZ(248px); }
+  .face-3 { background-image: url('assets/poster-3.jpeg'); transform: rotateY(144deg)  translateZ(248px); }
+  .face-4 { background-image: url('assets/poster-4.jpeg'); transform: rotateY(216deg)  translateZ(248px); }
+  .face-5 { background-image: url('assets/poster-5.jpeg'); transform: rotateY(288deg)  translateZ(248px); }
+
+  .hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    pointer-events: none;
+  }
+  .hero-content > * { pointer-events: auto; }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    background: var(--cream);
+    color: var(--blue);
+    padding: 6px 14px;
+    margin-bottom: 28px;
+  }
+
+  h1.hero-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 7.5vw, 110px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    margin-bottom: 24px;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.4);
+  }
+  h1.hero-title em {
+    font-style: normal;
+    color: var(--cream);
+    background: var(--ink);
+    padding: 0 12px;
+  }
+
+  .hero-sub {
+    font-size: clamp(16px, 1.6vw, 19px);
+    max-width: 50ch;
+    margin: 0 auto 36px;
+    font-weight: 500;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 2px solid var(--cream);
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--cream);
+    color: var(--blue);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--cream);
+  }
+  .btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .btn .arrow {
+    transition: transform 0.2s;
+  }
+  .btn:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  /* ============ CRITERIA — what I'm looking for ============ */
+  .criteria {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 100px 32px;
+  }
+  .criteria-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-tag {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    color: var(--cream);
+    opacity: 0.7;
+  }
+  .criteria h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.9;
+    margin-bottom: 64px;
+    letter-spacing: -0.01em;
+    max-width: 14ch;
+  }
+  .criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0;
+    border-top: 1px solid rgba(244, 237, 224, 0.2);
+  }
+  .criterion {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 32px 28px 32px 0;
+    border-bottom: 1px solid rgba(244, 237, 224, 0.2);
+    border-right: 1px solid rgba(244, 237, 224, 0.2);
+  }
+  .criterion:last-child { border-right: none; }
+  .criterion-icon {
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--cream);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 20px;
+  }
+  .criterion-label {
+    font-family: 'Anton', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+  }
+  .criterion-detail {
+    font-size: 14px;
+    opacity: 0.7;
+    line-height: 1.5;
+  }
+
+  /* ============ CONTACT ============ */
+  .contact {
+    padding: 120px 32px;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  .contact-inner {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .contact .section-tag {
+    color: var(--blue);
+    opacity: 1;
+  }
+  .contact h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.9;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .contact-lead {
+    font-size: 19px;
+    margin-bottom: 56px;
+    max-width: 50ch;
+    color: #2a2a2a;
+  }
+  form { display: grid; gap: 28px; }
+
+  /* Contact cards (mailto/whatsapp/tel) */
+  .contact-options {
+    display: grid;
+    gap: 16px;
+  }
+  .contact-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px;
+    background: var(--ink);
+    color: var(--cream);
+    text-decoration: none;
+    border: 2px solid var(--ink);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .contact-card:hover {
+    background: var(--blue);
+    transform: translate(-3px, -3px);
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .contact-card-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    border: 2px solid var(--cream);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 24px;
+    line-height: 1;
+  }
+  .contact-card-body { flex: 1; min-width: 0; }
+  .contact-card-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .contact-card-value {
+    font-family: 'Anton', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+    margin-bottom: 6px;
+    word-break: break-word;
+  }
+  .contact-card-hint {
+    font-size: 14px;
+    opacity: 0.7;
+    font-weight: 500;
+  }
+  .contact-card-arrow {
+    font-family: 'Anton', sans-serif;
+    font-size: 32px;
+    transition: transform 0.2s;
+    margin-left: 8px;
+  }
+  .contact-card:hover .contact-card-arrow {
+    transform: translateX(6px);
+  }
+  @media (max-width: 560px) {
+    .contact-card {
+      padding: 20px 22px;
+      gap: 18px;
+    }
+    .contact-card-icon {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      font-size: 20px;
+    }
+    .contact-card-value { font-size: 20px; }
+    .contact-card-arrow { font-size: 24px; }
+  }
+
+  .field { display: grid; gap: 8px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--blue);
+  }
+  .field input,
+  .field textarea {
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    background: transparent;
+    padding: 12px 0;
+    font-family: 'Manrope', sans-serif;
+    font-size: 18px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+    border-radius: 0;
+  }
+  .field input:focus,
+  .field textarea:focus { border-color: var(--blue); }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .field-hint { font-size: 13px; color: #555; }
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 600px) {
+    .row-2 { grid-template-columns: 1fr; }
+  }
+  .submit {
+    background: var(--blue);
+    color: var(--cream);
+    border: none;
+    padding: 22px 32px;
+    font-family: 'Anton', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    justify-self: start;
+  }
+  .submit:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+  .submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .form-status {
+    margin-top: 16px;
+    padding: 16px 20px;
+    font-weight: 600;
+    display: none;
+  }
+  .form-status.success {
+    display: block;
+    background: var(--blue);
+    color: var(--cream);
+  }
+  .form-status.error {
+    display: block;
+    background: #ff4444;
+    color: white;
+  }
+  .alt-contact {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(0,0,0,0.2);
+  }
+  .alt-contact p { font-size: 15px; color: #444; }
+  .alt-contact a {
+    color: var(--blue);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  /* ============ ABOUT ============ */
+  .about {
+    padding: 120px 32px;
+    background: var(--blue);
+    color: var(--cream);
+  }
+  .about-inner { max-width: 1100px; margin: 0 auto; }
+  .about h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.9;
+    margin-bottom: 56px;
+    letter-spacing: -0.01em;
+    max-width: 14ch;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+  .about-text p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  .facts {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 36px;
+    border: 2px solid var(--cream);
+    box-shadow: 8px 8px 0 var(--cream);
+    position: sticky;
+    top: 32px;
+  }
+  .facts h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+  .facts dl { display: grid; gap: 18px; }
+  .facts dt {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  .facts dd {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .facts hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 4px 0;
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 40px 32px;
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  /* ============ Mobile ============ */
+  @media (max-width: 720px) {
+    .nav { left: 20px; right: 20px; top: 20px; }
+    .stage {
+      height: 60vh;
+      min-height: 380px;
+    }
+    .column { width: 240px; height: 360px; }
+    .face { width: 240px; height: 360px; }
+    .face-1 { transform: rotateY(0deg)   translateZ(165px); }
+    .face-2 { transform: rotateY(72deg)  translateZ(165px); }
+    .face-3 { transform: rotateY(144deg) translateZ(165px); }
+    .face-4 { transform: rotateY(216deg) translateZ(165px); }
+    .face-5 { transform: rotateY(288deg) translateZ(165px); }
+    .hero::after { width: 320px; bottom: 14%; }
+    .criteria, .about, .contact { padding: 80px 20px; }
+    .criterion { padding: 24px 20px 24px 0; }
+    .facts { position: static; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .column { animation-duration: 200s; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <strong>JONAS@HAMBURG</strong>
+  <a href="#tipp">Tipp abgeben ↓</a>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="stage" aria-hidden="true">
+    <div class="column">
+      <div class="face face-1"></div>
+      <div class="face face-2"></div>
+      <div class="face face-3"></div>
+      <div class="face face-4"></div>
+      <div class="face face-5"></div>
+    </div>
+  </div>
+
+  <div class="hero-content">
+    <span class="eyebrow">Wohnungssuche · Hamburg</span>
+    <h1 class="hero-title">Help a Homie<br>find a Home.</h1>
+    <p class="hero-sub">Ich bin Jonas. Ich suche eine 1–2-Zimmer-Wohnung in Hamburg und bin auf deine Hilfe angewiesen. Zur Belohnung gibt es 200 €, ein Kasten Bier und meine ewige Dankbarkeit.</p>
+    <div class="cta-row">
+      <a href="#tipp" class="btn btn-primary">Kontakt <span class="arrow">→</span></a>
+      <a href="#mich" class="btn btn-secondary">Über mich</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WAS ICH SUCHE ============ -->
+<section class="criteria">
+  <div class="criteria-inner">
+    <div class="section-tag">→ Was ich suche</div>
+    <h2>Die Eckdaten.</h2>
+    <div class="criteria-grid">
+      <div class="criterion">
+        <div class="criterion-icon">⌂</div>
+        <div class="criterion-label">1–2 Rooms</div>
+        <div class="criterion-detail">Ab ca. 35 m². Altbau, Neubau, Hinterhof — alles willkommen.</div>
+      </div>
+      <div class="criterion">
+        <div class="criterion-icon">€</div>
+        <div class="criterion-label">Bis 1.100 €</div>
+        <div class="criterion-detail">Warm. Bisschen Spielraum nach oben für die richtige Wohnung.</div>
+      </div>
+      <div class="criterion">
+        <div class="criterion-icon">♥</div>
+        <div class="criterion-label">Keine Untermiete</div>
+        <div class="criterion-detail">Bitte, bitte. Ich suche etwas Festes.</div>
+      </div>
+      <div class="criterion">
+        <div class="criterion-icon">◉</div>
+        <div class="criterion-label">Alles außer Winterhude</div>
+        <div class="criterion-detail">Ottensen, Eimsbüttel, St. Pauli, Altona, Schanze — gerne.</div>
+      </div>
+      <div class="criterion">
+        <div class="criterion-icon">▦</div>
+        <div class="criterion-label">Flexibles Datum</div>
+        <div class="criterion-detail">Ich richte mich nach dir. Allerspätestens 1. August, gerne früher.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KONTAKT ============ -->
+<section class="contact" id="tipp">
+  <div class="contact-inner">
+    <div class="section-tag">→ Dein Tipp</div>
+    <h2>Du kennst was?</h2>
+    <p class="contact-lead">
+      Schick mir kurz, was du weißt — egal über welchen Kanal. Ich melde mich innerhalb von 24 Stunden zurück. Versprochen.
+    </p>
+
+    <div class="contact-options">
+      <a href="mailto:jonassucht040wohnung@gmail.com?subject=Wohnungstipp%20f%C3%BCr%20Jonas&body=Hi%20Jonas%2C%0A%0Aich%20habe%20einen%20Tipp%20f%C3%BCr%20dich%3A%0A%0A%E2%80%A2%20Lage%3A%20%0A%E2%80%A2%20Gr%C3%B6%C3%9Fe%2FZimmer%3A%20%0A%E2%80%A2%20Miete%3A%20%0A%E2%80%A2%20Verf%C3%BCgbar%20ab%3A%20%0A%E2%80%A2%20Sonstiges%3A%20%0A%0AViele%20Gr%C3%BC%C3%9Fe" class="contact-card">
+        <div class="contact-card-icon">✉</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Per E-Mail</div>
+          <div class="contact-card-value">E-Mail</div>
+          <div class="contact-card-hint">Öffnet dein Mail-Programm mit vorausgefülltem Text.</div>
+        </div>
+        <div class="contact-card-arrow">→</div>
+      </a>
+
+      <a href="https://wa.me/491727752167?text=Hi%20Jonas%2C%20ich%20habe%20einen%20Wohnungstipp%20f%C3%BCr%20dich%3A" target="_blank" rel="noopener" class="contact-card">
+        <div class="contact-card-icon">✓</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Per WhatsApp</div>
+          <div class="contact-card-value">WhatsApp</div>
+          <div class="contact-card-hint">Kurz, schnell, direkt. Öffnet WhatsApp.</div>
+        </div>
+        <div class="contact-card-arrow">→</div>
+      </a>
+
+      <a href="tel:+491727752167" class="contact-card">
+        <div class="contact-card-icon">☎</div>
+        <div class="contact-card-body">
+          <div class="contact-card-label">Anrufen</div>
+          <div class="contact-card-value">Telefon</div>
+          <div class="contact-card-hint">Wenn's eilig ist oder du lieber sprichst.</div>
+        </div>
+        <div class="contact-card-arrow">→</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ÜBER MICH ============ -->
+<section class="about" id="mich">
+  <div class="about-inner">
+    <div class="section-tag">→ Über mich</div>
+    <h2>Wer hier einzieht.</h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>Mein Name ist Jonas. Ich arbeite als Data Stratege bei Jung von Matt in Hamburg — also Werbeagentur, viel am Schreibtisch, viel mit Menschen. Tagsüber im Büro, abends unterwegs oder beim Sport.</p>
+        <p>Ich bin ruhig, ordentlich und pflichtbewusst, was Miete und Nebenkosten angeht. Keine lauten Partys, keine Tiere, kein Drama. Ich bin Nichtraucher. Ich behandle eine Wohnung wie jemand, der weiß, dass es in Hamburg ein kleines Wunder ist, eine zu finden.</p>
+        <p><strong>Überzeugt?</strong> Selbstauskunft, Gehaltsnachweise, Schufa und Bürgschaften kann ich innerhalb eines Tages liefern. Inkl. Private Haftpflicht. Und — beim Einzug bin ich flexibel.</p>
+      </div>
+      <aside class="facts">
+        <h3>Auf einen Blick</h3>
+        <dl>
+          <div>
+            <dt>Beruf</dt>
+            <dd>Data &amp; AI Strategist</dd>
+          </div>
+          <hr>
+          <div>
+            <dt>Arbeitgeber</dt>
+            <dd>Jung von Matt, Hamburg<br>(unbefristet, festangestellt)</dd>
+          </div>
+          <hr>
+          <div>
+            <dt>Bonität</dt>
+            <dd>Schufa sauber · keine offenen Posten</dd>
+          </div>
+          <hr>
+          <div>
+            <dt>Einkommen</dt>
+            <dd>Reicht souverän für die gesuchte Miete · Nachweise auf Anfrage</dd>
+          </div>
+          <hr>
+          <div>
+            <dt>Bereit</dt>
+            <dd>Selbstauskunft &amp; Unterlagen<br>innerhalb 24 h</dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © 2026 · Jonas sucht eine Wohnung in Hamburg · Mit Liebe gebaut, mit Hoffnung verschickt.
+</footer>
+
+<script>
+  // Smooth scroll is handled via CSS scroll-behavior.
+  // No form logic needed — direct mailto/tel/wa.me links handle contact.
+</script>
+
+</body>
+</html>
